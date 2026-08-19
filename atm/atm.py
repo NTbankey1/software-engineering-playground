@@ -85,4 +85,16 @@ class ATM:
     def withdraw_cash(self, amount: int) -> None:
         if self._current_card is None:
             return 
+        if not self._cash_dispenser.can_dispense_cash(amount):
+            raise RuntimeError("Insufficient cash available in the ATM")
+        self._bank_service.deposit_money(self._current_card, amount)
+        try:
+            self._cash_dispenser.dispense_cash(amount)
+        except Exception as e:
+            self._bank_service.deposit_money(self._current_card, amount)
+            raise e
+        
+    def deposit_cash(self,amount: int) --> None:
+        if self._cuurent_card is None:
+            return 
         self._bank_service.deposit_money(self._current_card, amount)

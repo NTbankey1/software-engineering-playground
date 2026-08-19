@@ -1,4 +1,9 @@
+from abc import ABC, abstractmethod
+from operation_type import OperationType
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from atm import ATM
 
 
 class ATMState(ABC):

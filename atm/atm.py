@@ -3,13 +3,14 @@ from typing import Optional
 from  atm_state import ATMState
 from bank_service import BankService
 from card import Card
-from operation_type import operation_type
+from operation_type import OperationType
 from note_dispenser import NoteDispenser10, NoteDispenser20, NoteDispenser50
 from cash_dispenser import CashDispenser
+import threading 
 
 class ATM:
     _instance: Optional['ATM'] = None
-    _lock = therading.Lock()
+    _lock = threading.Lock()
     
     _state: ATMState
     _bank_service:BankService
@@ -30,17 +31,17 @@ class ATM:
             return 
         super().__init__()
         self._initialized = True 
-        self._state = IdleState()
+        self._state = ()
         self._bank_service = BankService()
         self._current_card: Optional[Card] = None
         self._transaction_counter = 0
 
-    c1 = NoteDispenser10(10)
-    c2 = NoteDispenser20(20)
-    c3 = NoteDispenser50(50)
-    c1.set_next_chain(c2)
-    c2.set_next_chain(c3)
-    self._cash_dispenser = CashDispenser(c1)
+        c1 = NoteDispenser10(10)
+        c2 = NoteDispenser20(20)
+        c3 = NoteDispenser50(50)
+        c1.set_next_chain(c2)
+        c2.set_next_chain(c3)
+        self._cash_dispenser = CashDispenser(c1)
 
     @classmethod
     def get_instance(cls) -> 'ATM':
@@ -94,7 +95,10 @@ class ATM:
             self._bank_service.deposit_money(self._current_card, amount)
             raise e
         
-    def deposit_cash(self,amount: int) --> None:
+    def deposit_cash(self,amount: int) -> None:
         if self._cuurent_card is None:
             return 
         self._bank_service.deposit_money(self._current_card, amount)
+
+    def select_operation(self, op: OperationType, *args: int) -> None:
+        self._state.select_openration(self, op, *args)

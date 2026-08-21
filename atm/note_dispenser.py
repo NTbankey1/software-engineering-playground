@@ -28,3 +28,33 @@ class NoteDispenser(DispenseChain):
 
             elif self._next_chain is not None:
                 self._next_chain.dispense(amount)
+
+    
+    def can_dispense(self, amount: int) -> bool:
+        with self._lock:
+            if amount < 0:
+                return False
+            if amount == 0:
+                return True
+
+            num_to_use = min(amount // self._note_value, self._num_notes)
+            remaining_amount = amount - (num_to_use * self._note_value)
+
+            if remaining_amount == 0:
+                return True
+
+            if self._next_chain is not None:
+                return self._next_chain.can_dispense(remaining_amount)
+            return False
+
+class NoteDispenser20(NoteDispenser):
+    def __init__(self, num_notes: int):
+        super().__init__(20, num_notes)
+
+class NoteDispenser50(NoteDispenser):
+    def __init__(self, num_notes: int):
+        super().__init__(50, num_notes)
+
+class NoteDispenser100(NoteDispenser):
+    def __init__(self, num_notes):
+        super().__init__(100, num_notes)
